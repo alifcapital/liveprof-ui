@@ -2,3 +2,5 @@
 vendor
 composer.lock
 db_data
+/src/config/aggregator_services.yaml
+/live.profiler.ui.log

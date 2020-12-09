@@ -8,6 +8,7 @@ namespace Badoo\LiveProfilerUI\ConsoleCommands;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class AggregateAllProfilesCommand extends Command
@@ -18,6 +19,7 @@ class AggregateAllProfilesCommand extends Command
             ->setName('cron:aggregate-all-profiles')
             ->setDescription('Aggregate profiles for last N days.')
             ->setHelp('Aggregate profiles for last N days.')
+            ->addOption('today', 't', InputOption::VALUE_OPTIONAL, 'Aggregate starting today', false)
             ->addArgument('last_num_days', InputArgument::OPTIONAL, 'Number of last days for aggregating.', 3);
     }
 
@@ -36,9 +38,12 @@ class AggregateAllProfilesCommand extends Command
         $App = new \Badoo\LiveProfilerUI\LiveProfilerUI();
 
         $last_num_days = (int)$input->getArgument('last_num_days');
+        $option = $input->getOption('today');
+        $today = (bool)$option;
+
         $output->writeln('Aggregating profiles for ' . $last_num_days . ' days');
 
-        $snapshots = $App->getAggregator()->getSnapshotsDataForProcessing($last_num_days);
+        $snapshots = $App->getAggregator()->getSnapshotsDataForProcessing($last_num_days, $today);
 
         foreach ($snapshots as $snapshot) {
             $result = $App->getAggregator()

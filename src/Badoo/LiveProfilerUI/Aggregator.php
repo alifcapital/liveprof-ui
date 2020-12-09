@@ -442,9 +442,9 @@ class Aggregator
                 'method_id' => $map[trim(strtolower($method_name))]['id'],
             ];
             foreach ($this->fields as $field) {
-                $insert_data[$field] = (float)$data[$field];
+                $insert_data[$field] = (int)$data[$field];
                 foreach ($this->field_variations as $variation) {
-                    $insert_data[$variation . '_' . $field] = (float)$data[$variation . '_' . $field];
+                    $insert_data[$variation . '_' . $field] = (int)$data[$variation . '_' . $field];
                 }
             }
             $inserts[] = $insert_data;
@@ -533,7 +533,7 @@ class Aggregator
      * @param int $last_num_days
      * @return array
      */
-    public function getSnapshotsDataForProcessing(int $last_num_days) : array
+    public function getSnapshotsDataForProcessing(int $last_num_days, bool $today) : array
     {
         if ($last_num_days < 1) {
             throw new \InvalidArgumentException('Num of days must be > 0');
@@ -541,7 +541,7 @@ class Aggregator
 
         // Get already aggregated snapshots
         $dates = DateGenerator::getDatesArray(
-            date('Y-m-d', strtotime('-1 day')),
+            $today ? date('Y-m-d') : date('Y-m-d', strtotime('-1 day')),
             $last_num_days,
             $last_num_days
         );
@@ -557,7 +557,7 @@ class Aggregator
         // Get all snapshots for last 3 days
         $snapshots = $this->Source->getSnapshotsDataByDates(
             date('Y-m-d 00:00:00', strtotime('-' . $last_num_days . ' days')),
-            date('Y-m-d 23:59:59', strtotime('-1 day'))
+            $today ? date('Y-m-d 23:59:59') : date('Y-m-d 23:59:59', strtotime('-1 day'))
         );
 
         // Exclude already aggregated snapshots
